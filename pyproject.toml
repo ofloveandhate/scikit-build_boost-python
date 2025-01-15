@@ -1,0 +1,19 @@
+[build-system]
+requires = [
+    "scikit-build-core",
+]
+
+build-backend = "scikit_build_core.build"
+
+
+[project]
+
+name = "example"
+version = "0.0.0"
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.scikit-build]
+wheel.expand-macos-universal-tags = true
+
