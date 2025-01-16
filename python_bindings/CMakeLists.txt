@@ -37,36 +37,5 @@ target_link_libraries(example_compiled_python_bindings PRIVATE ${Boost_LIBRARIES
 
 
 
+install(TARGETS example_compiled_python_bindings LIBRARY DESTINATION .)
 
-
-
-# We are using the SKBUILD variable, which is defined when scikit-build is
-# running the CMake build, to control building the Python wrapper. This allows
-# the C++ project to be installed, standalone, when using the standard CMake
-# build flow.
-if(DEFINED SKBUILD)
-
-		
-
-	install(TARGETS example_compiled_python_bindings LIBRARY DESTINATION .)
-
-
-	# The extension module must load the hello library as a dependency when the
-	# extension module is loaded. The easiest way to locate the hello library is
-	# via RPATH. Absolute RPATHs are possible, but they make the resulting
-	# binaries not redistributable to other Python installations (conda is broke,
-	# wheel reuse is broke, and more!).
-	#
-	# Placing the hello library in the package and using relative RPATHs that
-	# doesn't point outside of the package means that the built package is
-	# relocatable. This allows for safe binary redistribution.
-	if(APPLE)
-	  set_target_properties(
-	    example_compiled_python_bindings PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
-	else()
-	  set_target_properties(example_compiled_python_bindings PROPERTIES INSTALL_RPATH
-	                                          "$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
-	endif()
-	
-
-endif()

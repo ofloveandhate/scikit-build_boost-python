@@ -11,9 +11,28 @@ build-backend = "scikit_build_core.build"
 name = "example"
 version = "0.0.0"
 
+requires-python = ">= 3.8"
+readme = "README.md"
+
+
+
+
 [project.optional-dependencies]
 test = ["pytest"]
 
-[tool.scikit-build]
-wheel.expand-macos-universal-tags = true
 
+
+
+[tool.scikit-build]
+wheel.packages = ["python_wrapper/example"]
+wheel.expand-macos-universal-tags = true
+wheel.install-dir = "example"
+
+build-dir = "build/{wheel_tag}"
+
+
+
+
+[project.urls]
+
+Repository = "https://github.com/ofloveandhate/scikit-build_boost-python.git"
