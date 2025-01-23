@@ -8,9 +8,16 @@
 
 
 cmake_minimum_required(VERSION 3.22) 
-project(example_core_lib)
+project(
+    example_core_lib
+    VERSION "0.0.0"
+    LANGUAGES CXX
+)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(CMakePrintHelpers) # so we can print cmake variable values
 
 # In order to find conda, run 'conda activate' and then use 'cmake .. -DCMAKE_PREFIX_PATH=$CONDA_PREFIX' when cmaking
 
@@ -83,12 +90,6 @@ set(EXAMPLE_CORE_SOURCES
 
 
 
-
-target_sources(example_core_lib PRIVATE
-    ${EXAMPLE_CORE_HEADERS}
-    ${EXAMPLE_CORE_SOURCES}
-)
-
 set(REQUIRED_EXTERNAL_LIBRARIES
     ${GMP_LIBRARIES}
     ${MPFR_LIBRARIES}
@@ -97,21 +98,91 @@ set(REQUIRED_EXTERNAL_LIBRARIES
     ${Boost_LIBRARIES}
 )
 
-target_include_directories(example_core_lib PUBLIC "include/")
 
-target_link_libraries(example_core_lib ${REQUIRED_EXTERNAL_LIBRARIES})
+
+
+if(PROJECT_IS_TOP_LEVEL)
+    add_library(example_core_lib)
+endif()
+
+
+target_sources(example_core_lib PRIVATE
+    ${EXAMPLE_CORE_HEADERS}
+    ${EXAMPLE_CORE_SOURCES}
+)
+
+target_include_directories(example_core_lib PUBLIC $<INSTALL_INTERFACE:include>)
+
+target_link_libraries(example_core_lib PUBLIC ${REQUIRED_EXTERNAL_LIBRARIES})
 
 install( 
     TARGETS example_core_lib
-    ARCHIVE DESTINATION "lib"
-    LIBRARY DESTINATION "lib"
-    COMPONENT library
+    EXPORT exampleTargets  # this name should match the name below where we generate the cmake files for finding the package
+    # ARCHIVE DESTINATION "lib"
+    # LIBRARY DESTINATION "lib"
+    # COMPONENT library
+    FILE_SET HEADERS
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
 ) 
+
 
 install(
     FILES ${EXAMPLE_CORE_HEADERS}
     DESTINATION "include/example/"
 )
+
+
+
+
+
+############
+#
+#  cmake install files, so other packages can find the core
+#
+####
+
+# see https://github.com/scikit-build/scikit-build-sample-projects/blob/main/projects/hello-cmake-package/CMakeLists.txt
+# for my sources for doing this part
+
+# also, see https://cmake.org/cmake/help/latest/module/CMakePackageConfigHelpers.html.  
+# and https://iamsorush.com/posts/cpp-cmake-config/
+
+# this cmake include gives us access to CMAKE_INSTALL_INCLUDEDIR
+include(GNUInstallDirs)  # https://cmake.org/cmake/help/latest/module/GNUInstallDirs.html
+
+set(EXAMPLE_CMAKE_PACKAGE_INSTALL_SUBDIR "share/example/cmake")
+set(SYSCONFIG_INSTALL_DIR ${CMAKE_INSTALL_SYSCONFDIR}
+    CACHE PATH "Location of configuration files" )
+
+install(
+  EXPORT exampleTargets  # this name before Targets should match the name of the variable set above in a previous install call
+  NAMESPACE example::
+  DESTINATION ${EXAMPLE_CMAKE_PACKAGE_INSTALL_SUBDIR})
+
+include(CMakePackageConfigHelpers)
+
+write_basic_package_version_file(
+  exampleConfigVersion.cmake
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion)
+
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})  #set so we can use in configure_package_config_file()
+set(LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}) # ditto
+
+configure_package_config_file(
+  "${PROJECT_SOURCE_DIR}/../cmake/exampleConfig.cmake.in" exampleConfig.cmake
+  PATH_VARS INCLUDE_INSTALL_DIR SYSCONFIG_INSTALL_DIR LIB_INSTALL_DIR
+  INSTALL_DESTINATION ${EXAMPLE_CMAKE_PACKAGE_INSTALL_SUBDIR}
+  )
+
+install(FILES "${PROJECT_BINARY_DIR}/exampleConfig.cmake"
+              "${PROJECT_BINARY_DIR}/exampleConfigVersion.cmake"
+        DESTINATION ${EXAMPLE_CMAKE_PACKAGE_INSTALL_SUBDIR})
+
+
 
 
 
@@ -134,6 +205,10 @@ set(EXAMPLE_EXECUTABLE_HEADERS
 )
 
 
+if(PROJECT_IS_TOP_LEVEL)
+    add_executable(example_core_exe)
+endif()
+
 target_sources(example_core_exe PRIVATE ${EXAMPLE_EXECUTABLE_SOURCES} ${EXAMPLE_EXECUTABLE_HEADERS})
 
 target_link_libraries(example_core_exe example_core_lib)
@@ -146,8 +221,6 @@ install(
     ARCHIVE DESTINATION "bin"
     COMPONENT executable
 ) 
-
-
 
 
 
