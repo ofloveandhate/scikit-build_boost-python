@@ -29,7 +29,7 @@ include(CMakePrintHelpers) # so we can print cmake variable values
 
 cmake_print_variables(CMAKE_CURRENT_SOURCE_DIR)
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC")
 
@@ -106,12 +106,21 @@ if(PROJECT_IS_TOP_LEVEL)
 endif()
 
 
+
 target_sources(example_core_lib PRIVATE
     ${EXAMPLE_CORE_HEADERS}
     ${EXAMPLE_CORE_SOURCES}
 )
 
-target_include_directories(example_core_lib PUBLIC $<INSTALL_INTERFACE:include>)
+# see https://stackoverflow.com/questions/25676277/cmake-target-include-directories-prints-an-error-when-i-try-to-add-the-source
+# for more on these generator expressions, $<INSTALL_INTERFACE, etc.
+
+target_include_directories(example_core_lib PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>  
+    $<INSTALL_INTERFACE:include>  # <prefix>/include
+    )
+
+# target_include_directories(example_core_lib PUBLIC $<INSTALL_INTERFACE:include>)
 
 target_link_libraries(example_core_lib PUBLIC ${REQUIRED_EXTERNAL_LIBRARIES})
 

@@ -58,7 +58,11 @@ if(PROJECT_IS_TOP_LEVEL)
     set_property(TARGET example_compiled_python_bindings PROPERTY OUTPUT_NAME _example)
 endif()
 
-target_include_directories(example_compiled_python_bindings PUBLIC "include/")
+
+target_include_directories(example_compiled_python_bindings PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>  
+    $<INSTALL_INTERFACE:include>  # <prefix>/include
+    )
 
 target_sources(example_compiled_python_bindings PUBLIC ${SOURCES} ${HEADERS})
 
