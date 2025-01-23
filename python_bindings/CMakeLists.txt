@@ -7,10 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(CMakePrintHelpers) # so we can print cmake variable values
 
-find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)  
+find_package(Python 3.13 REQUIRED COMPONENTS Interpreter Development.Module NumPy)  
 
 find_package(Boost COMPONENTS system python3 REQUIRED)
-find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
 
 
 if (PROJECT_IS_TOP_LEVEL)
