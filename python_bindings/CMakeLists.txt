@@ -66,9 +66,11 @@ target_include_directories(example_compiled_python_bindings PUBLIC
 target_sources(example_compiled_python_bindings PUBLIC ${SOURCES} ${HEADERS})
 
 if(PROJECT_IS_TOP_LEVEL)
-	target_link_libraries(example_compiled_python_bindings PRIVATE ${Boost_LIBRARIES} ${exampleLIBDIR})
+    cmake_print_variables(example_LIBRARIES)
+    cmake_print_variables(${Boost_LIBRARIES})
+	target_link_libraries(example_compiled_python_bindings PUBLIC ${Boost_LIBRARIES} ${example})
 else()
-	target_link_libraries(example_compiled_python_bindings PRIVATE ${Boost_LIBRARIES} example_core_lib)
+	target_link_libraries(example_compiled_python_bindings PUBLIC ${Boost_LIBRARIES} example_core_lib)
 endif()
 
 # trying to get it to install to the correct directory
@@ -80,7 +82,7 @@ endif()
 if(${SKBUILD})
 	install(TARGETS example_compiled_python_bindings LIBRARY DESTINATION .)
 else()
-	install(TARGETS example_compiled_python_bindings LIBRARY DESTINATION ${Python_SITELIB}/bertini)
+	install(TARGETS example_compiled_python_bindings LIBRARY DESTINATION ${Python_SITELIB}/example)
 endif()
 
 
