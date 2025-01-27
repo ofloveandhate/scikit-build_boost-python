@@ -18,11 +18,11 @@ if (PROJECT_IS_TOP_LEVEL)
 
 # code to inspect the values of variables, so we can find the ones that are made by the above call.
 # see https://stackoverflow.com/questions/49858267/with-find-package-how-do-i-know-which-variables-have-to-be-used-for-linking
-    get_cmake_property(_variableNames VARIABLES)
-    list (SORT _variableNames)
-    foreach (_variableName ${_variableNames})
-        message(STATUS "${_variableName}=${${_variableName}}")
-    endforeach()
+    # get_cmake_property(_variableNames VARIABLES)
+    # list (SORT _variableNames)
+    # foreach (_variableName ${_variableNames})
+    #     message(STATUS "${_variableName}=${${_variableName}}")
+    # endforeach()
 
     include_directories(${exampleINCLUDES})
 endif()
