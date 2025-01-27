@@ -24,7 +24,7 @@ if (PROJECT_IS_TOP_LEVEL)
     #     message(STATUS "${_variableName}=${${_variableName}}")
     # endforeach()
 
-    include_directories(${exampleINCLUDES})
+    include_directories(${example_INCLUDE_DIRS})
 endif()
 
 
